@@ -5,7 +5,7 @@ import DateTimePicker from "react-datetime-picker";
 import Swal from "sweetalert2";
 import { useDispatch, useSelector } from "react-redux";
 import { uiCloseModal } from "../../actions/ui";
-import { eventAddNew, eventClearActiveEvent, eventUpdated } from "../../actions/events";
+import {  eventClearActiveEvent, eventStartAddNew, eventStartUpdate } from "../../actions/events";
 
 const customStyles = {
   content: {
@@ -49,7 +49,9 @@ export const CalendarModal = () => {
   useEffect(() => {
     
     if ( activeEvent){
+      
       setformValues ( activeEvent);
+      
     }else{
       setformValues(initEvent);
     }
@@ -108,19 +110,12 @@ export const CalendarModal = () => {
       return;
     }
 
-    console.log('boton guardar');
+    
     if  ( activeEvent){
-      console.log('actualizar');
-      dispatch(eventUpdated( formValues));
+      
+      dispatch(eventStartUpdate( formValues));
     }else{
-      dispatch(eventAddNew({
-        ...formValues,
-        id: new Date().getTime(),
-        user:{
-          _id: '123',
-          name:'Maximo'
-        }
-      }));
+      dispatch(eventStartAddNew(formValues));
     }
 
     settitleValid(true);
@@ -136,16 +131,17 @@ export const CalendarModal = () => {
       className="modal"
       overlayClassName="modal-fondo"
     >
-      <h1> Nuevo evento </h1>
+      <h1> { (activeEvent)? 'Editar evento': 'Nuevo evento' } </h1>
       <hr />
       <form className="container" onSubmit={handleSubmitForm}>
         <div className="form-group">
           <label>Fecha y hora inicio</label>
-          {/* <input className="form-control" placeholder="Fecha inicio" /> */}
+          
           <DateTimePicker
             onChange={handleStartDateChange}
-            value={dateStart}
+            value={  (activeEvent) ? activeEvent.start : dateStart }
             className="form-control"
+            
           />
         </div>
 
@@ -153,9 +149,10 @@ export const CalendarModal = () => {
           <label>Fecha y hora fin</label>
           <DateTimePicker
             onChange={handleEndDateChange}
-            value={dateEnd}
+            value={   (activeEvent) ? activeEvent.end : dateEnd }
             className="form-control"
             minDate={dateStart}
+            
           />
         </div>
 
